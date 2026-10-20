@@ -39,7 +39,7 @@ export type NomeTech = (typeof techs)[number]["nome"];
 
 export const fatos = [
   { id: "idade", foto: "sorriso", numero: perfil.idade },
-  { id: "eng", foto: "hackathon" },
+  { id: "eng", foto: "hackathon", enquadre: "50% 12%" },
   { id: "casada", foto: "casal" },
   { id: "pet", foto: "pet3" },
 ] as const;

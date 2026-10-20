@@ -1,10 +1,11 @@
 import { Environment, Lightformer, MeshReflectorMaterial, Sparkles } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { SVGLoader } from "three/examples/jsm/loaders/SVGLoader.js";
 import { techs, type Tech } from "../data";
+import { modoLeve } from "../lib/gsap";
 
 // Estado escrito pelo ScrollTrigger e lido a cada frame (sem re-render do React)
 export type EstadoStack = { montagem: number; anel: number };
@@ -80,6 +81,7 @@ function Logo({ tech, i, estado }: { tech: Tech; i: number; estado: React.RefObj
         castShadow
         onPointerOver={(e) => {
           e.stopPropagation();
+          if (e.pointerType !== "mouse") return;
           giroAlvo.current += Math.PI * 2;
           document.body.style.cursor = "grab";
         }}
@@ -103,13 +105,13 @@ function Logo({ tech, i, estado }: { tech: Tech; i: number; estado: React.RefObj
   );
 }
 
-function Palco() {
+function Palco({ leve }: { leve: boolean }) {
   const aneis = useRef<THREE.Group>(null!);
   useFrame((_, dt) => (aneis.current.rotation.y += dt * 0.25));
 
   return (
     <group position={[0, -0.6, 0]}>
-      <mesh position={[0, -0.15, 0]} receiveShadow>
+      <mesh position={[0, -0.15, 0]} receiveShadow={!leve}>
         <cylinderGeometry args={[4.8, 5.1, 0.3, 96]} />
         <meshStandardMaterial color="#120a33" metalness={0.8} roughness={0.25} />
       </mesh>
@@ -134,6 +136,10 @@ function Palco() {
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position-y={-0.32}>
         <planeGeometry args={[80, 80]} />
+        {/* o reflexo renderiza a cena duas vezes: pesado demais para celular */}
+        {leve ? (
+          <meshStandardMaterial color="#0a0626" metalness={0.5} roughness={0.55} />
+        ) : (
         <MeshReflectorMaterial
           blur={[400, 120]}
           resolution={512}
@@ -147,19 +153,22 @@ function Palco() {
           metalness={0.6}
           mirror={0}
         />
+        )}
       </mesh>
     </group>
   );
 }
 
-function Camera() {
+function Camera({ leve }: { leve: boolean }) {
   const { size } = useThree();
   useFrame((st, dt) => {
     // tela em pé (celular) precisa da câmera bem mais longe para caber o anel
-    const longe = size.width < size.height ? 19 : 11.5;
+    const longe = size.width < size.height ? 17.5 : 11.5;
+    const px = leve ? 0 : st.pointer.x;
+    const py = leve ? 0 : st.pointer.y;
     const c = st.camera;
-    c.position.x = suave(c.position.x, st.pointer.x * 1.2, 2, dt);
-    c.position.y = suave(c.position.y, 2.4 + st.pointer.y * 0.6, 2, dt);
+    c.position.x = suave(c.position.x, px * 1.2, 2, dt);
+    c.position.y = suave(c.position.y, 2.4 + py * 0.6, 2, dt);
     c.position.z = suave(c.position.z, longe, 2, dt);
     c.lookAt(0, 0.9, 0);
   });
@@ -168,28 +177,30 @@ function Camera() {
 
 // Carregado sob demanda (React.lazy): three.js só baixa quando a página já abriu
 export default function StackCanvas({ estado, visivel }: { estado: React.RefObject<EstadoStack>; visivel: boolean }) {
+  // decidido uma vez: trocar no meio recriaria materiais e causaria um "piscar"
+  const [leve] = useState(modoLeve);
   return (
     <Canvas
       className="stack-canvas"
       frameloop={visivel ? "always" : "never"}
-      dpr={[1, 1.75]}
-      shadows
+      dpr={leve ? [1, 1.5] : [1, 1.75]}
+      shadows={!leve}
       camera={{ position: [0, 3, 14], fov: 38 }}
       gl={{ antialias: true, powerPreference: "high-performance" }}
     >
-      <Cena estado={estado} />
+      <Cena estado={estado} leve={leve} />
     </Canvas>
   );
 }
 
-function Cena({ estado }: { estado: React.RefObject<EstadoStack> }) {
+function Cena({ estado, leve }: { estado: React.RefObject<EstadoStack>; leve: boolean }) {
   return (
     <>
       <color attach="background" args={["#07041a"]} />
       <fog attach="fog" args={["#07041a", 11, 30]} />
-      <Camera />
+      <Camera leve={leve} />
       <ambientLight intensity={0.25} />
-      <spotLight position={[0, 10, 4]} angle={0.45} penumbra={1} intensity={260} color="#ffffff" castShadow />
+      <spotLight position={[0, 10, 4]} angle={0.45} penumbra={1} intensity={260} color="#ffffff" castShadow={!leve} />
       <pointLight position={[-6, 2.5, 3]} intensity={70} color="#7b2ff7" />
       <pointLight position={[6, 2.5, 3]} intensity={70} color="#ff3ea5" />
       <pointLight position={[0, 3, -6]} intensity={60} color="#5ad1ff" />
@@ -198,9 +209,9 @@ function Cena({ estado }: { estado: React.RefObject<EstadoStack> }) {
         <Logo key={t.nome} tech={t} i={i} estado={estado} />
       ))}
 
-      <Palco />
-      <Sparkles count={90} scale={[16, 7, 12]} position={[0, 2.5, 0]} size={4} speed={0.4} color="#ffc8e8" />
-      <Sparkles count={60} scale={[14, 6, 10]} position={[0, 2.5, 0]} size={3} speed={0.3} color="#5ad1ff" />
+      <Palco leve={leve} />
+      <Sparkles count={leve ? 40 : 90} scale={[16, 7, 12]} position={[0, 2.5, 0]} size={4} speed={0.4} color="#ffc8e8" />
+      <Sparkles count={leve ? 25 : 60} scale={[14, 6, 10]} position={[0, 2.5, 0]} size={3} speed={0.3} color="#5ad1ff" />
 
       <Environment resolution={256}>
         <Lightformer form="ring" intensity={4} color="#ff3ea5" position={[0, 4, -7]} scale={6} />
@@ -209,9 +220,12 @@ function Cena({ estado }: { estado: React.RefObject<EstadoStack> }) {
         <Lightformer intensity={5} color="#ffffff" position={[0, 7, 4]} rotation-x={Math.PI / 2} scale={[8, 1.5, 1]} />
       </Environment>
 
-      <EffectComposer>
-        <Bloom mipmapBlur luminanceThreshold={0.85} intensity={0.9} radius={0.7} />
-      </EffectComposer>
+      {/* bloom (brilho) só na versão completa: em GPUs de celular causava cintilação */}
+      {!leve && (
+        <EffectComposer>
+          <Bloom mipmapBlur luminanceThreshold={0.85} intensity={0.9} radius={0.7} />
+        </EffectComposer>
+      )}
     </>
   );
 }

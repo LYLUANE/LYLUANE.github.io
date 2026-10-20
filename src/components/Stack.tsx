@@ -13,6 +13,8 @@ export default function Stack() {
   const { t } = useIdioma();
   const estado = useRef<EstadoStack>({ montagem: 0, anel: 0 });
   const [ativo, setAtivo] = useState(0);
+  const proximo = useRef(0);
+  const espera = useRef<number | undefined>(undefined);
   const [visivel, setVisivel] = useState(false);
 
   // Só renderiza o 3D quando a seção está perto da tela
@@ -40,7 +42,11 @@ export default function Stack() {
         onUpdate: (s) => {
           const anel = s.progress * (techs.length - 1);
           estado.current.anel = anel;
-          setAtivo(Math.round(anel));
+          const indice = Math.round(anel);
+          if (indice === proximo.current) return;
+          proximo.current = indice;
+          clearTimeout(espera.current);
+          espera.current = window.setTimeout(() => setAtivo(indice), 140);
         },
       });
     },
