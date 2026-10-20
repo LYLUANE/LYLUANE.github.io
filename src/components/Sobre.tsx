@@ -46,18 +46,22 @@ export default function Sobre() {
         <h2 className="titulo">
           {t.sobre.titulo} <em className="serif">{perfil.nome}</em>
         </h2>
-        <p className="sobre-intro">
-          {t.sobre.intro}
-        </p>
+        <p className="sobre-intro">{t.sobre.intro}</p>
       </div>
 
       <div className="cards">
         {fatos.map((f) => {
-          const txt: { titulo: string; destaque?: string; texto: string } = t.fatos[f.id];
+          const txt: { titulo: string; destaque?: string; texto: string; selo?: string } = t.fatos[f.id];
           return (
           <article key={f.id} className="card3d" onPointerMove={(e) => inclinar(e)} onPointerLeave={soltar}>
             <div className="card3d-inner">
-              <img src={foto(f.foto)} alt="" loading="lazy" />
+              <img
+                src={foto(f.foto)}
+                alt=""
+                loading="lazy"
+                style={"enquadre" in f ? { objectPosition: f.enquadre } : undefined}
+              />
+              {txt.selo && <span className="card3d-selo">✦ {txt.selo}</span>}
               <div className="card3d-holo" aria-hidden />
               <div className="card3d-conteudo">
                 {"numero" in f && <span className="fato-numero grad-text">{f.numero}</span>}

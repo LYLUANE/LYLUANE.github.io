@@ -12,7 +12,7 @@ type Textos = {
   hero: { selo: string; ola: string; papel: string; papel2: string; scroll: string; alt: string };
   manifesto: Rico;
   sobre: { eyebrow: string; titulo: string; intro: string };
-  fatos: Record<IdFato, { titulo: string; destaque?: string; texto: string }>;
+  fatos: Record<IdFato, { titulo: string; destaque?: string; texto: string; selo?: string }>;
   stack: { eyebrow: string; titulo: string; destaque: string; dica: string; aria: string };
   techs: Record<NomeTech, { area: string; frase: string }>;
   galeria: { eyebrow: string; titulo: string; destaque: string; texto: string };
@@ -56,7 +56,12 @@ export const textos: Record<Idioma, Textos> = {
     },
     fatos: {
       idade: { titulo: "anos", texto: "de curiosidade infinita e vontade de criar." },
-      eng: { titulo: "Engenheira", destaque: "da Computação", texto: "Do hardware ao software, da lógica ao design." },
+      eng: {
+        titulo: "Engenheira",
+        destaque: "da Computação",
+        texto: "Do hardware ao software, da lógica ao design.",
+        selo: "Hackathon Unesp Botucatu 2025",
+      },
       casada: { titulo: "Casada", texto: "e muito bem acompanhada nessa jornada." },
       pet: { titulo: "Mãe de pet", texto: "dos meus companheiros de quatro patas." },
     },
@@ -143,7 +148,12 @@ export const textos: Record<Idioma, Textos> = {
     },
     fatos: {
       idade: { titulo: "years old", texto: "of endless curiosity and the urge to create." },
-      eng: { titulo: "Computer", destaque: "Engineer", texto: "From hardware to software, from logic to design." },
+      eng: {
+        titulo: "Computer",
+        destaque: "Engineer",
+        texto: "From hardware to software, from logic to design.",
+        selo: "Unesp Botucatu Hackathon 2025",
+      },
       casada: { titulo: "Married", texto: "and in great company on this journey." },
       pet: { titulo: "Pet mom", texto: "to my four-legged companions." },
     },
