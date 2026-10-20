@@ -938,11 +938,13 @@ main {
 .transicao-palavra {
   font-family: var(--fonte-display);
   font-weight: 800;
-  /* a palavra tem ~3,5× a largura da fonte: 25vw a mantém inteira em qualquer tela */
-  font-size: clamp(4rem, 25vw, 26rem);
-  line-height: 0.9;
-  letter-spacing: -0.05em;
-  will-change: transform;
+  /* a palavra tem ~3,3× a largura da fonte: 24vw a mantém inteira em qualquer tela */
+  font-size: clamp(4rem, 24vw, 25rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  /* o gradiente só é pintado dentro da caixa do elemento: sem esse respiro, a ponta
+     do "V" (e o topo/base das letras) ficava fora dela e aparecia cortada no celular */
+  padding: 0.12em 0.16em;
 }
 .transicao-veu {
   position: absolute;
