@@ -938,7 +938,8 @@ main {
 .transicao-palavra {
   font-family: var(--fonte-display);
   font-weight: 800;
-  font-size: clamp(7rem, 34vw, 30rem);
+  /* a palavra tem ~3,5× a largura da fonte: 25vw a mantém inteira em qualquer tela */
+  font-size: clamp(4rem, 25vw, 26rem);
   line-height: 0.9;
   letter-spacing: -0.05em;
   will-change: transform;
@@ -1140,6 +1141,20 @@ main {
   .contato-rodape {
     flex-direction: column;
     align-items: center;
+  }
+}
+
+/* celulares bem estreitos (360px): links e seletor de idioma cabendo na barra */
+@media (max-width: 380px) {
+  .nav {
+    padding: 8px 8px 8px 14px;
+  }
+  .nav nav a {
+    padding: 8px 6px;
+    font-size: 0.74rem;
+  }
+  .nav-idioma button {
+    padding: 6px 7px;
   }
 }
 
