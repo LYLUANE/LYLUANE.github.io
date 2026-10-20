@@ -1,14 +1,23 @@
 # Portfólio — Evelyn Luane
 
 Landing page pessoal com animações de scroll e um palco 3D com a stack.
-Projeto independente da loja PLANAR (não entra no deploy do `frontend/`).
+
+**No ar:** https://lyluane.github.io · versão em inglês: https://lyluane.github.io/?lang=en
 
 ```bash
-cd portfolio
 npm install
 npm run dev       # http://localhost:5173
-npm run build     # gera dist/ (base relativa, funciona em qualquer subpasta)
+npm run build     # gera dist/
 ```
+
+## Branches e deploy
+
+| Branch    | Uso                                                              |
+|-----------|------------------------------------------------------------------|
+| `develop` | trabalho do dia a dia (features saem e voltam para cá)            |
+| `main`    | versão publicada: cada push dispara o deploy no GitHub Pages     |
+
+O workflow fica em `.github/workflows/deploy.yml`.
 
 ## Seções
 
